@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Booker  | Seat Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main>
+        <header>
+            <h1>Movie Booker</h1>
+            <p class="subtitle">Book and reserve your seats for the latest movies</p>
+        </header>
+
+        <section class="controls">
+            <label for="showtime-select">Screening:</label>
+            <select id="showtime-select">
+                {% for show in showtimes %}
+                <option value="{{ show['id'] }}" data-price="{{show['ticket_price'] }}">
+                    {{ show['movie_title'] }} - {{ show['start_time'] }} (${{ "%.2f"|format(show['ticket_price'])}})
+                </option>
+                {% endfor %}
+            </select>
+
+        </section>
+
+        <ul class="legend">
+            <li><span class="seat"></span> Available</li>
+            <li><span class="seat selected"></span> Selected</li>
+            <li><span class="seat occupied"></span> Occupied</li>
+        </ul>
+
+        <div class="theater">
+            <div class="screen">Screen</div>
+            <div id="seat-grid" class="seat-grid"></div>
+        </div>
+
+        <form id="booking-form" class="checkout panel">
+            <div class="summary">
+                <p>Selected Seats: <strong id="selected-list">None</strong></p>
+                <p>Total Price: <strong id="total-price">$0.00</strong></p>
+            </div>
+            <div class="input-group">
+                <input type="text" id="customer-name" placeholder="Enter your full name" required>
+                <button type="submit" id="book-btn" disabled>Confirm Booking</button>
+            </div>
+            <p id="status-msg" class="status-msg"></p>
+        </form>
+    </main>
+
+    <script>
+        const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+        const cols = 10;
+        const seatGrid = document.getElementById('seat-grid');
+        const showtimeSelect = document.getElementById('showtime-select');
+        const selectedList = document.getElementById('selected-list');
+        const totalPriceElem = document.getElementById('total-price');
+        const bookBtn = document.getElementById('book-btn');
+        const statusMsg = document.getElementById('status-msg');
+
+        let selectedSeats = new Set();
+
+        function renderGrid(occupiedSeats = []) {
+            seatGrid.innerHTML = '';
+            selectedSeats.clear();
+            updateSummary();
+
+            rows.forEach(row => {
+                for (let col = 1; col <= cols; col++) {
+                    const seatCode = `${row}${col}`;
+                    const seat = document.createElement('button');
+                    seat.type = 'button';
+                    seat.classList.add('seat');
+                    seat.dataset.seat = seatCode;
+                    seat.textContent = seatCode;
+
+                    if (occupiedSeats.includes(seatCode)) {
+                        seat.classList.add('occupied');
+                        seat.disabled = true;
+                    } else {
+                        seat.addEventListener('click', () => toggleSeat(seat, seatCode));
+                    }
+                    seatGrid.appendChild(seat);
+                }
+            })
+        }
+
+        function toggleSeat(seatEl, seatCode) {
+            if (selectedSeats.has(seatCode)) {
+                selectedSeats.delete(seatCode);
+                seatEl.classList.remove('selected');
+            } else {
+                selectedSeats.add(seatCode);
+                seatEl.classList.add('selected');
+            }
+            updateSummary();
+        }
+
+        function updateSummary() {
+            const price = parseFloat(showtimeSelect.selectedOptions[0].dataset.price);
+            const seatsArray = Array.from(selectedSeats).sort();
+            selectedList.textContent = seatsArray.length ? seatsArray.join(', ') : 'None';
+            totlaPriceEl.textContent = `$${(seatsArray.length * price).toFixed(2)}`;
+            bookBtn.disabled = seatsArray.length === 0;
+        }
+
+        async function loadSeats() {
+            const showtimeId = showtimeSelect.value;
+            const res = await fetch(`/api/seats/${showtimeId}`);
+            const data = await res.json();
+            renderGrid(data.booked_seats);
+        }
+
+        showtimeSelect.addEventListener('change', () => {
+            statusMsg.textContent = '';
+            loadSeats();
+        })
+
+        document.getElementById('booking-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                showtime_id: showtimeSelect.value,
+                seats:Array.from(selectedSeats),
+                customer_name: document.getElementById('customer-name').value
+            }
+
+            const res = await fetch('/api/book', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            })
+            const data = await res. json();
+
+            statusMsg.textContent = data.message; || data.error;
+            statusMsg.className = `status-msg ${res.ok ? 'success' : 'error'}`;
+            if (res.ok) {
+                document.getElementById('customer-name').value = '';
+                loadSeats();
+            }
+        })
+
+        loadSeats();
+    </script>

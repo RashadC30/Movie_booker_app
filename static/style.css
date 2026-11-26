@@ -1,0 +1,245 @@
+:root {
+    --bg-dark: #150f2a;
+    --card-bg: #1e293b;
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --seat-avail: green;
+    --seat-hover: rgba(5, 89, 9, 0.853);
+    --seat-selected: goldenrod;
+    --seat-occupied: maroon;
+    --accent: #0284c7;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+    min-height: 100vh;
+}
+
+.container {
+    width: 100%;
+    max-width: 680px;
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.25rem;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+select,
+input {
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    border: 1px solid #334155;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    list-style: none;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.legend .seat {
+    width: 16px;
+    height: 16px;
+    cursor: default;
+}
+
+.theater {
+    perspective: 600px;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.screen {
+    background: linear-gradient(to bottom, #ffffff, #94a3b8);
+    height: 36px;
+    width: 85%;
+    margin-bottom: 1.75rem;
+    transform: rotateX(-35deg);
+    box-shadow: 0 12px 24px rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+    color: var(--bg-dark);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.seat-grid {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.seat {
+    background-color: var(--seat-avail);
+    color: var(--text-primary);
+    border: none;
+    border-radius: 6px 6px 2px 2px;
+    height: 36px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.seat:not(.occupied):hover {
+    background-color: var(--seat-hover);
+    transform: scale(1.08);
+}
+
+.seat.selected {
+    background-color: var(--seat-selected);
+    color: var(--bg-dark);
+}
+
+.seat.occupied {
+    background-color: var(--seat-occupied);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.walkway-divider {
+    grid-column: 1 / -1;
+    position: relative;
+    height: 44px;
+    margin: 0.35rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Horizontal metallic safety railing */
+.walkway-divider::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #64748b 8%, #94a3b8 50%, #64748b 92%, transparent);
+    border-radius: 2px;
+}
+
+/* Vertical railing posts */
+.walkway-divider::after {
+    content: "";
+    position: absolute;
+    top: 9px;
+    left: 6%;
+    right: 6%;
+    height: 12px;
+    background-image: repeating-linear-gradient(to right,
+            #475569 0px,
+            #475569 2px,
+            transparent 2px,
+            transparent 44px);
+}
+
+.walkway-divider span {
+    background-color: var(--card-bg);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    padding: 0 1rem;
+    margin-top: 12px;
+    z-index: 1;
+}
+
+.checkout-panel {
+    border-top: 1px solid #334155;
+    padding-top: 1.25rem;
+}
+
+.summary {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.input-group input {
+    flex: 1;
+}
+
+button[type="submit"] {
+    background-color: var(--accent);
+    color: white;
+    border: none;
+    padding: 0 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+button[type="submit"]:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.status-msg {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.status-msg.success {
+    color: #4ade80;
+}
+
+.status-msg.error {
+    color: #f87171;
+}

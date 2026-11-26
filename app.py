@@ -12,7 +12,7 @@ def get_db():
 def init_db():
     """Initializes the database with simple movies and showtimes."""
     with get_db() as conn:
-        conn.executesscript("""
+        conn.executescript("""
             CREATE TABLE IF NOT EXISTS showtimes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 movie_title TEXT NOT NULL,
@@ -33,10 +33,10 @@ def init_db():
             conn.executemany(
                 "INSERT INTO showtimes (movie_title, start_time, ticket_price) VALUES (?, ?, ?)",
                 [
-                    ("Project Hail Mary, 4:30 PM", 15.50),
-                    ("The Super Mario Galaxy Movie, 6:00 PM", 12.75),
-                    ("Resident Evil, 7:30 PM", 15.50),
-                    ("GOAT, 6:50 PM", 12.75),
+                    ("Project Hail Mary", "4:30 PM", 15.50),
+                    ("The Super Mario Galaxy Movie", "6:00 PM", 12.75),
+                    ("Resident Evil", "7:30 PM", 15.50),
+                    ("GOAT", "6:50 PM", 12.75),
                     
                 ]
             )

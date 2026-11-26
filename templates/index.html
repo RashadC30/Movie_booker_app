@@ -83,6 +83,12 @@
                     }
                     seatGrid.appendChild(seat);
                 }
+                if (row === 'C') {
+                    const walkway = document.createElement('div');
+                    walkway.classList.add('walkway-divider');
+                    walkway.innerHTML = '<span>WALKWAY</span>';
+                    seatGrid.appendChild(walkway);
+                }
             })
         }
 
@@ -101,7 +107,7 @@
             const price = parseFloat(showtimeSelect.selectedOptions[0].dataset.price);
             const seatsArray = Array.from(selectedSeats).sort();
             selectedList.textContent = seatsArray.length ? seatsArray.join(', ') : 'None';
-            totlaPriceEl.textContent = `$${(seatsArray.length * price).toFixed(2)}`;
+            totalPriceElem.textContent = `$${(seatsArray.length * price).toFixed(2)}`;
             bookBtn.disabled = seatsArray.length === 0;
         }
 
@@ -132,7 +138,7 @@
             })
             const data = await res. json();
 
-            statusMsg.textContent = data.message; || data.error;
+            statusMsg.textContent = data.message || data.error;
             statusMsg.className = `status-msg ${res.ok ? 'success' : 'error'}`;
             if (res.ok) {
                 document.getElementById('customer-name').value = '';
